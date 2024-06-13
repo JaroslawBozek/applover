@@ -1,15 +1,24 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from models import db, Book
+import re
 
 api = Blueprint('api', __name__)
 
+def is_six_digit(value):
+    if (re.fullmatch(r'^\d{6}$', value)):
+        return True
+    else:
+        return False
 
 @api.route('/books', methods=['POST'])
 def add_book():
 
     data = request.get_json()
     
+    if not is_six_digit(data['serial_number']):
+        return jsonify({'message': 'Error, serial_number must be a six-digit string'}), 400
+        
     book = Book.query.filter_by(serial_number=data['serial_number']).first()
     if book:
         return jsonify({'message': 'Serial number already exists'}), 400
@@ -19,6 +28,7 @@ def add_book():
         title=data['title'],
         author=data['author'],
     )
+    
     db.session.add(new_book)
     db.session.commit()
     return jsonify({'message': 'Book added'}), 200
@@ -51,11 +61,16 @@ def delete_book(serial_number):
 
 @api.route('/books/<serial_number>', methods=['PATCH'])
 def update_status(serial_number):
+    
     data = request.get_json()
+    
+    if not is_six_digit(data['borrowed_by']):
+        return jsonify({'message': 'Error, borrowed_by must be a six-digit string'}), 400
+        
     book = Book.query.filter_by(serial_number=serial_number).first()
     if book:
         book.is_borrowed = data['is_borrowed']
-        book.borrowed_by = data.get('borrowed_by') if data['is_borrowed'] else None
+        book.borrowed_by = data['borrowed_by'] if data['is_borrowed'] else None
         book.borrowed_on = datetime.now() if data['is_borrowed'] else None
             
         db.session.commit()

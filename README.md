@@ -1,12 +1,18 @@
 # Containerized library API
+`git clone https://github.com/JaroslawBozek/applover`
 
 ## Run App
+Go to the folder with Dockerfile
 
+## Option 1: Docker compose
+`docker-compose up`
+
+## Option 2: Docker build
 ### Build a docker image
-`sudo docker build -t applover-library .`
+`docker build -t applover-library .`
 
 ### Build and run a container
-`sudo docker run -p 3000:3000 applover-library`
+`docker run -p 3000:3000 applover-library`
 
 ## Routes
 
