@@ -33,7 +33,16 @@ def add_book():
     db.session.commit()
     return jsonify({'message': 'Book added'}), 200
 
-
+@api.route('/books/<serial_number>', methods=['DELETE'])
+def delete_book(serial_number):
+    book = Book.query.filter_by(serial_number=serial_number).first()
+    if book:
+        db.session.delete(book)
+        db.session.commit()
+        return jsonify({'message': 'Book deleted'}), 200
+    else:
+        return jsonify({'message': 'Book not found'}), 404
+        
 @api.route('/books', methods=['GET'])
 def get_books():
     books = Book.query.all()
@@ -46,18 +55,6 @@ def get_books():
         'borrowed_by': book.borrowed_by,
         'borrowed_on': book.borrowed_on
     } for book in books])
-
-
-@api.route('/books/<serial_number>', methods=['DELETE'])
-def delete_book(serial_number):
-    book = Book.query.filter_by(serial_number=serial_number).first()
-    if book:
-        db.session.delete(book)
-        db.session.commit()
-        return jsonify({'message': 'Book deleted'}), 200
-    else:
-        return jsonify({'message': 'Book not found'}), 404
-
 
 @api.route('/books/<serial_number>', methods=['PATCH'])
 def update_status(serial_number):
